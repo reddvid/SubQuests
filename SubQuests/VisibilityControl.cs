@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
 
-namespace SubQuests
+namespace SubQuests.UWP
 {
     class VisibilityControl : IValueConverter
     {

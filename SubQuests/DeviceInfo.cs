@@ -7,7 +7,7 @@ using Windows.ApplicationModel;
 using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.System.Profile;
 
-namespace SubQuests
+namespace SubQuests.UWP
 {
     class DeviceInfo
     {

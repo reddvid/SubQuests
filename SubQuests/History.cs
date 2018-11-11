@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SubQuests
+namespace SubQuests.UWP
 {
     [DataContract]
     public class History

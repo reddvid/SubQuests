@@ -26,7 +26,7 @@ using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace SubQuests
+namespace SubQuests.UWP
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -151,7 +151,7 @@ namespace SubQuests
             }
             catch (Exception ex)
             {
-                // Make your own quote
+                // Make your own quote              
                 tb_q.Text = "Something went wrong: " + ex.Message.ToString();
             }
 
@@ -161,8 +161,6 @@ namespace SubQuests
             {
                 // hide buttons
                 btn_showans.Visibility = btn_next.Visibility = Visibility.Collapsed;
-                this.UnloadObject(btn_showans);
-                this.UnloadObject(btn_next);
                 this.FindName("btn_refresh");
             }
             else
@@ -287,8 +285,8 @@ namespace SubQuests
             // via email
             EmailMessage emailMessage = new EmailMessage();
             emailMessage.To.Add(new EmailRecipient("redappsupport@outlook.com"));
-            emailMessage.Body = "SubQuests " + _di.appversion + "\n" + _di.devname + "\n" + _di.devmanufacturer + " " + _di.devmodel + "\n" + _di.sysfam + " " + _di.sysversion + " " + _di.sysarch + "\n\n\n";
-            emailMessage.Subject = "[FEEDBACK] SubQuests";
+            emailMessage.Body = "SubQuests.UWP " + _di.appversion + "\n" + _di.devname + "\n" + _di.devmanufacturer + " " + _di.devmodel + "\n" + _di.sysfam + " " + _di.sysversion + " " + _di.sysarch + "\n\n\n";
+            emailMessage.Subject = "[FEEDBACK] SubQuests.UWP";
             await EmailManager.ShowComposeNewEmailAsync(emailMessage);
         }
 
@@ -300,6 +298,18 @@ namespace SubQuests
         private void btn_history_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(HistoryPage));
+        }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.NewSize.Width >= 1008)
+            {
+                lv_history.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                lv_history.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void btn_refresh_Click(object sender, RoutedEventArgs e)
