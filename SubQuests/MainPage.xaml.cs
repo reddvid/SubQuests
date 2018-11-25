@@ -1,28 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.Email;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.System;
-using Windows.System.Profile;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -46,13 +36,15 @@ namespace SubQuests.UWP
 
             ApplicationView.PreferredLaunchViewSize = new Size(1200, 650);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
-            
+
+            btn_refresh.Visibility = Visibility.Collapsed;
+
             // Load History
             LoadHistory();
 
             // LOAD SUBNET QUESTION --- http://subnettingquestions.com/
             if (tb_q.Text.Contains("Sample"))
-                LoadQuestion("http://subnettingquestions.com/");            
+                LoadQuestion("http://subnettingquestions.com/");
         }
 
         private async void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
@@ -148,6 +140,8 @@ namespace SubQuests.UWP
                 tb_ans.Text = getBetween(jsonstring, x1, x2);
 
                 // Enable buttons
+                ShowButtons();
+
             }
             catch (Exception ex)
             {
@@ -160,22 +154,47 @@ namespace SubQuests.UWP
             if (tb_q.Text.Contains("wrong"))
             {
                 // hide buttons
-                btn_showans.Visibility = btn_next.Visibility = Visibility.Collapsed;
-                this.FindName("btn_refresh");
+                HideButtons();
             }
             else
             {
                 // show buttons
-                this.FindName("btn_next");
-                this.FindName("btn_showans");
-                this.UnloadObject(btn_refresh);
+                ShowButtons();
             }
         }
 
-        private void AddandSaveList(string text1, string text2)
+        private void HideButtons()
         {
-            if (!text1.Contains("Something went wrong") || !text1.Contains("Sample question"))
-                _historylist.Insert(0, new History() { q = text1, a = text2 });
+            btn_showans.Visibility = btn_next.Visibility = Visibility.Collapsed;
+            btn_refresh.Visibility = Visibility.Visible;
+        }
+
+        private void ShowButtons()
+        {
+            btn_showans.Visibility = btn_next.Visibility = Visibility.Visible;
+            btn_refresh.Visibility = Visibility.Collapsed;
+        }
+
+        private void AddandSaveList(string questionString, string answerString)
+        {
+            try
+            {
+
+                if (!questionString.Contains("Something went wrong") || !questionString.Contains("Sample question"))
+                {
+                    foreach (var h in _historylist)
+                    {
+                        if (!h.q.Equals(questionString) && !h.a.Equals(answerString))
+                        {
+                            _historylist.Insert(0, new History() { q = questionString, a = answerString });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
 
             if (!IsMobile)
                 lv_history.ItemsSource = _historylist;
@@ -195,9 +214,7 @@ namespace SubQuests.UWP
                 }
             }
 
-            // Refresh question 
-            // LOAD SUBNET QUESTION --- http://subnettingquestions.com/
-            LoadQuestion("http://subnettingquestions.com/");
+            
         }
 
         private string getBetween(string jsonString, string v1, string v2)
@@ -233,8 +250,9 @@ namespace SubQuests.UWP
 
         private void btn_next_Click(object sender, RoutedEventArgs e)
         {
-            // Save to history
-            AddandSaveList(tb_q.Text, tb_ans.Text);
+            // Refresh question 
+            // LOAD SUBNET QUESTION --- http://subnettingquestions.com/
+            LoadQuestion("http://subnettingquestions.com/");
 
             // Hide answer then change back to show
             g_answer.Visibility = Visibility.Collapsed;
@@ -292,7 +310,7 @@ namespace SubQuests.UWP
 
         private void lv_history_LayoutUpdated(object sender, object e)
         {
-            CheckHistory();
+           
         }
 
         private void btn_history_Click(object sender, RoutedEventArgs e)
@@ -309,6 +327,40 @@ namespace SubQuests.UWP
             else
             {
                 lv_history.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void ToggleHistoryBtn_Checked(object sender, RoutedEventArgs e)
+        {
+            MainSplitView.IsPaneOpen = true;
+            MainSplitView.OpenPaneLength = 320;
+
+            MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+        }
+
+        private void ToggleHistoryBtn_Unchecked(object sender, RoutedEventArgs e)
+        {
+            MainSplitView.IsPaneOpen = false;
+        }
+
+        private void Lv_history_Loaded(object sender, RoutedEventArgs e)
+        {
+            CheckHistory();
+        }
+
+        private void Tb_q_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Save to history
+            AddandSaveList(tb_q.Text, tb_ans.Text);
+        }
+
+        private void Lv_history_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = e.ClickedItem as History;
+            if (item != null)
+            {
+                tb_q.Text = item.q;
+                tb_ans.Text = item.a;
             }
         }
 

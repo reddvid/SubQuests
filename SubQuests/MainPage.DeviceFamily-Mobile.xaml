@@ -1,46 +1,44 @@
-﻿<contract5Present:Page
+﻿<Page
     x:Class="SubQuests.UWP.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:UI="using:Microsoft.Advertising.WinRT.UI"
-    xmlns:contract5NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:contract5Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:SubQuests.UWP"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
 
-    <contract5Present:Page.Transitions>
-        <contract5Present:TransitionCollection>
-            <contract5Present:NavigationThemeTransition>
-                <contract5Present:NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                    <contract5Present:CommonNavigationTransitionInfo />
-                </contract5Present:NavigationThemeTransition.DefaultNavigationTransitionInfo>
-            </contract5Present:NavigationThemeTransition>
-        </contract5Present:TransitionCollection>
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <CommonNavigationTransitionInfo />
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
 
-    </contract5Present:Page.Transitions>
+    </Page.Transitions>
 
-    <contract5Present:Page.Resources>
+    <Page.Resources>
         <local:VisibilityControl x:Key="viscontrol" />
-    </contract5Present:Page.Resources>
+    </Page.Resources>
 
-    <contract5Present:Grid x:Name="g_mainlayout" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <contract5Present:Grid.RowDefinitions>
-            <contract5Present:RowDefinition Height="*" />
-            <contract5Present:RowDefinition Height="Auto" />
-            <contract5Present:RowDefinition Height="Auto" />
-            <contract5Present:RowDefinition Height="Auto" />
-        </contract5Present:Grid.RowDefinitions>
-        <contract5Present:Grid x:Name="g_main" Margin="12">
-            <contract5Present:Grid.ChildrenTransitions>
-                <contract5Present:TransitionCollection>
-                    <contract5Present:RepositionThemeTransition />
-                </contract5Present:TransitionCollection>
-            </contract5Present:Grid.ChildrenTransitions>
+    <Grid x:Name="g_mainlayout" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid x:Name="g_main" Margin="12">
+            <Grid.ChildrenTransitions>
+                <TransitionCollection>
+                    <RepositionThemeTransition />
+                </TransitionCollection>
+            </Grid.ChildrenTransitions>
             <!--  HEADER  -->
-            <contract5Present:TextBlock
+            <TextBlock
                 x:Name="tb_head"
                 Grid.Row="3"
                 HorizontalAlignment="Center"
@@ -48,33 +46,33 @@
                 FontWeight="Black"
                 Text="Subnetting Questions" />
             <!--  QUESTION PANEL  -->
-            <contract5Present:StackPanel
+            <StackPanel
                 x:Name="g_question"
                 Margin="12,24"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
-                <contract5Present:TextBlock
+                <TextBlock
                     FontWeight="Bold"
                     Foreground="LightGray"
                     Text="Question:" />
-                <contract5Present:Border Height="12" />
-                <contract5Present:TextBlock
+                <Border Height="12" />
+                <TextBox
                     x:Name="tb_q"
                     FontSize="18"
                     FontStyle="Italic"
                     Text="Sample question"
                     TextWrapping="Wrap" />
-            </contract5Present:StackPanel>
+            </StackPanel>
             <!--  ANSWER PANEL  -->
-            <contract5Present:StackPanel
+            <StackPanel
                 x:Name="g_answer"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom">
-                <contract5Present:TextBlock
+                <TextBlock
                     Grid.Column="0"
                     FontSize="12"
                     Text="Answer:" />
-                <contract5Present:TextBlock
+                <TextBlock
                     x:Name="tb_ans"
                     Grid.Column="1"
                     HorizontalAlignment="Left"
@@ -82,22 +80,22 @@
                     FontWeight="Bold"
                     Text="Sample answer"
                     TextWrapping="Wrap" />
-            </contract5Present:StackPanel>
-        </contract5Present:Grid>
-        <contract5Present:StackPanel
+            </StackPanel>
+        </Grid>
+        <StackPanel
             x:Name="sp_buttons"
             Grid.Row="1"
             Margin="12"
             VerticalAlignment="Bottom">
-            <contract5Present:Button
+            <Button
                 x:Name="btn_showans"
                 Grid.Column="0"
                 Height="36"
                 HorizontalAlignment="Stretch"
                 Click="btn_showans_Click"
                 Content="Show answer" />
-            <contract5Present:Border Height="6" />
-            <contract5Present:Button
+            <Border Height="6" />
+            <Button
                 x:Name="btn_refresh"
                 Grid.Column="0"
                 Height="36"
@@ -105,31 +103,31 @@
                 x:Load="False"
                 Click="btn_refresh_Click"
                 Content="Refresh" />
-            <contract5Present:Border Height="6" />
-            <contract5Present:Button
+            <Border Height="6" />
+            <Button
                 x:Name="btn_next"
                 Grid.Column="2"
                 Height="36"
                 HorizontalAlignment="Stretch"
                 Click="btn_next_Click"
                 Content="Next question" />
-            <contract5Present:Border Height="6" />
-            <contract5Present:Button
+            <Border Height="6" />
+            <Button
                 x:Name="btn_history"
                 Grid.Column="2"
                 Height="36"
                 HorizontalAlignment="Stretch"
                 Click="btn_history_Click"
                 Content="Questions history" />
-        </contract5Present:StackPanel>
-        <contract5Present:StackPanel
+        </StackPanel>
+        <StackPanel
             x:Name="g_about"
             Grid.Row="2"
             Margin="12"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom">
-            <contract5Present:StackPanel Orientation="Horizontal">
-                <contract5Present:HyperlinkButton
+            <StackPanel Orientation="Horizontal">
+                <HyperlinkButton
                     x:Name="btn_website"
                     Margin="0,0,6,0"
                     Padding="0"
@@ -137,8 +135,8 @@
                     Content="Subnetting Questions"
                     FontSize="12"
                     Style="{ThemeResource TextBlockButtonStyle}" />
-                <contract5Present:TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="website by" />
-                <contract5Present:HyperlinkButton
+                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="website by" />
+                <HyperlinkButton
                     x:Name="btn_websiteauthor"
                     Margin="6,0"
                     Padding="0"
@@ -146,11 +144,11 @@
                     Content="© Kim Nobay"
                     FontSize="12"
                     Style="{ThemeResource TextBlockButtonStyle}" />
-            </contract5Present:StackPanel>
-            <contract5Present:Border Height="4" />
-            <contract5Present:StackPanel Orientation="Horizontal">
-                <contract5Present:TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="App developed by" />
-                <contract5Present:HyperlinkButton
+            </StackPanel>
+            <Border Height="4" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="App developed by" />
+                <HyperlinkButton
                     x:Name="btn_dev"
                     Margin="6,1,6,0"
                     Padding="0"
@@ -158,30 +156,30 @@
                     Content="Red David"
                     FontSize="12"
                     Style="{ThemeResource TextBlockButtonStyle}" />
-                <contract5Present:HyperlinkButton
+                <HyperlinkButton
                     x:Name="btn_twitter"
                     Margin="6,0"
                     Padding="0"
                     Click="btn_twitter_Click">
-                    <contract5Present:Image Width="16" Source="/twitter.png" />
-                </contract5Present:HyperlinkButton>
-                <contract5Present:HyperlinkButton
+                    <Image Width="16" Source="/twitter.png" />
+                </HyperlinkButton>
+                <HyperlinkButton
                     x:Name="btn_fb"
                     Padding="0"
                     Click="btn_fb_Click">
-                    <contract5Present:Image Width="16" Source="/fb.png" />
-                </contract5Present:HyperlinkButton>
-            </contract5Present:StackPanel>
-            <contract5Present:Border Height="4" />
-            <contract5Present:StackPanel Orientation="Horizontal">
-                <contract5Present:HyperlinkButton
+                    <Image Width="16" Source="/fb.png" />
+                </HyperlinkButton>
+            </StackPanel>
+            <Border Height="4" />
+            <StackPanel Orientation="Horizontal">
+                <HyperlinkButton
                     x:Name="btn_donate"
                     Padding="0"
                     Click="btn_donate_Click"
                     Content="Donate via PayPal"
                     FontSize="12"
                     Style="{ThemeResource TextBlockButtonStyle}" />
-                <contract5Present:HyperlinkButton
+                <HyperlinkButton
                     x:Name="btn_feedback"
                     Margin="18,0"
                     Padding="0"
@@ -189,8 +187,8 @@
                     Content="Send feedback"
                     FontSize="12"
                     Style="{ThemeResource TextBlockButtonStyle}" />
-            </contract5Present:StackPanel>
-        </contract5Present:StackPanel>
+            </StackPanel>
+        </StackPanel>
         <!--  AD GOES HERE  -->
         <UI:AdControl
             Grid.Row="3"
@@ -200,6 +198,6 @@
             AdUnitId="1100017629"
             ApplicationId="9nplbp33n95t" />
 
-    </contract5Present:Grid>
+    </Grid>
 
-</contract5Present:Page>
+</Page>
