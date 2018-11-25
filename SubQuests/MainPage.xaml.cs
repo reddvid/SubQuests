@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Services.Store.Engagement;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +9,7 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using Windows.ApplicationModel.Email;
 using Windows.Foundation;
+using Windows.Graphics.Display;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -34,8 +36,7 @@ namespace SubQuests.UWP
         {
             this.InitializeComponent();
 
-            ApplicationView.PreferredLaunchViewSize = new Size(1200, 650);
-            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+            MaximizeApp();
 
             btn_refresh.Visibility = Visibility.Collapsed;
 
@@ -45,6 +46,13 @@ namespace SubQuests.UWP
             // LOAD SUBNET QUESTION --- http://subnettingquestions.com/
             if (tb_q.Text.Contains("Sample"))
                 LoadQuestion("http://subnettingquestions.com/");
+        }
+
+        private void MaximizeApp()
+        {
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(600, 700));
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Maximized;
+
         }
 
         private async void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
@@ -102,7 +110,7 @@ namespace SubQuests.UWP
             // Check if not mobile
             if (!IsMobile)
             {
-                lv_history.ItemsSource = _historylist;
+                lv_history.ItemsSource = _historylist; // new ObservableCollection<History>(_historylist.GroupBy(p => p.q).Select(g => g.First()).ToList());
                 CheckHistory();
             }
         }
@@ -118,6 +126,7 @@ namespace SubQuests.UWP
 
         private async void LoadQuestion(string v)
         {
+            btn_next.IsEnabled = false;
             var client = new HttpClient();
 
             try
@@ -165,12 +174,14 @@ namespace SubQuests.UWP
 
         private void HideButtons()
         {
+            // btn_showans.IsEnabled = btn_next.IsEnabled = false;
             btn_showans.Visibility = btn_next.Visibility = Visibility.Collapsed;
             btn_refresh.Visibility = Visibility.Visible;
         }
 
         private void ShowButtons()
         {
+            btn_showans.IsEnabled = btn_next.IsEnabled = true;
             btn_showans.Visibility = btn_next.Visibility = Visibility.Visible;
             btn_refresh.Visibility = Visibility.Collapsed;
         }
@@ -179,15 +190,15 @@ namespace SubQuests.UWP
         {
             try
             {
-
+                Debug.WriteLine("Saving item...");
                 if (!questionString.Contains("Something went wrong") || !questionString.Contains("Sample question"))
                 {
-                    foreach (var h in _historylist)
+                    if (!_historylist.Any(x => x.q.Equals(questionString)))
                     {
-                        if (!h.q.Equals(questionString) && !h.a.Equals(answerString))
-                        {
-                            _historylist.Insert(0, new History() { q = questionString, a = answerString });
-                        }
+                        Debug.WriteLine(questionString);
+
+                        _historylist.Insert(0, new History() { q = questionString, a = answerString });
+
                     }
                 }
             }
@@ -197,7 +208,7 @@ namespace SubQuests.UWP
             }
 
             if (!IsMobile)
-                lv_history.ItemsSource = _historylist;
+                lv_history.ItemsSource = _historylist;  // new ObservableCollection<History>(_historylist.GroupBy(p => p.q).Select(g => g.First()).ToList());
 
             // Now save the list
             if (_historylist.Count != 0)
@@ -214,7 +225,7 @@ namespace SubQuests.UWP
                 }
             }
 
-            
+
         }
 
         private string getBetween(string jsonString, string v1, string v2)
@@ -236,6 +247,11 @@ namespace SubQuests.UWP
         {
             if (btn_showans.Content.ToString().Contains("Show"))
             {
+                Debug.WriteLine("Showed answer...");
+
+                // Save to history
+                AddandSaveList(tb_q.Text, tb_ans.Text);
+
                 // Show answer panel then change content to hide
                 g_answer.Visibility = Visibility.Visible;
                 btn_showans.Content = "Hide answer";
@@ -250,6 +266,11 @@ namespace SubQuests.UWP
 
         private void btn_next_Click(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("Text changed...");
+
+            // Save to history
+            AddandSaveList(tb_q.Text, tb_ans.Text);
+
             // Refresh question 
             // LOAD SUBNET QUESTION --- http://subnettingquestions.com/
             LoadQuestion("http://subnettingquestions.com/");
@@ -283,7 +304,7 @@ namespace SubQuests.UWP
         {
             EmailMessage em = new EmailMessage();
             em.To.Add(new EmailRecipient("redappsupport@outlook.com"));
-            em.Subject = "[FEEDBACK] Subnetting Questions UWP";
+            em.Subject = "[FEEDBACK] SubQuests UWP";
             await EmailManager.ShowComposeNewEmailAsync(em);
         }
 
@@ -294,23 +315,32 @@ namespace SubQuests.UWP
 
         private async void btn_donate_Click(object sender, RoutedEventArgs e)
         {
-            await Launcher.LaunchUriAsync(new Uri("https://www.paypal.me/reddvid/249"));
+            await Launcher.LaunchUriAsync(new Uri("https://www.buymeacoffee.com/redDavid"));
         }
 
         private async void btn_feedback_Click(object sender, RoutedEventArgs e)
         {
-            DeviceInfo _di = new DeviceInfo();
-            // via email
-            EmailMessage emailMessage = new EmailMessage();
-            emailMessage.To.Add(new EmailRecipient("redappsupport@outlook.com"));
-            emailMessage.Body = "SubQuests.UWP " + _di.appversion + "\n" + _di.devname + "\n" + _di.devmanufacturer + " " + _di.devmodel + "\n" + _di.sysfam + " " + _di.sysversion + " " + _di.sysarch + "\n\n\n";
-            emailMessage.Subject = "[FEEDBACK] SubQuests.UWP";
-            await EmailManager.ShowComposeNewEmailAsync(emailMessage);
+            if (StoreServicesFeedbackLauncher.IsSupported())
+            {
+                // Launch feedback
+                var launcher = StoreServicesFeedbackLauncher.GetDefault();
+                await launcher.LaunchAsync();
+            }
+            else
+            {
+                DeviceInfo _di = new DeviceInfo();
+                // via email
+                EmailMessage emailMessage = new EmailMessage();
+                emailMessage.To.Add(new EmailRecipient("redappsupport@outlook.com"));
+                emailMessage.Body = "SubQuests " + _di.appversion + "\n" + _di.devname + "\n" + _di.devmanufacturer + " " + _di.devmodel + "\n" + _di.sysfam + " " + _di.sysversion + " " + _di.sysarch + "\n\n\n";
+                emailMessage.Subject = "[FEEDBACK] SubQuests";
+                await EmailManager.ShowComposeNewEmailAsync(emailMessage);
+            }
         }
 
         private void lv_history_LayoutUpdated(object sender, object e)
         {
-           
+
         }
 
         private void btn_history_Click(object sender, RoutedEventArgs e)
@@ -322,20 +352,67 @@ namespace SubQuests.UWP
         {
             if (e.NewSize.Width >= 1008)
             {
-                lv_history.Visibility = Visibility.Visible;
+                HideHistoryBtn.Margin = new Thickness(0, 40, 64, 0);
+                lv_history.Margin = new Thickness(12, 0, 64, 64);
+                HistoryHeader.Margin = new Thickness(12, 64, 0, 32);
+                ContentView.Padding = AboutPanel.Margin = new Thickness(64);
+                MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+                ToggleHistoryBtn.IsChecked = true;
+                HideHistoryBtn.Visibility = Visibility.Collapsed;
             }
             else
             {
-                lv_history.Visibility = Visibility.Collapsed;
+                HideHistoryBtn.Margin = new Thickness(0, 32, 24, 0);
+                lv_history.Margin = new Thickness(12, 0, 24, 24);
+                HistoryHeader.Margin = new Thickness(12, 32, 0, 24);
+                AboutPanel.Margin = new Thickness(24);
+                ContentView.Padding = new Thickness(24, 32, 24, 24);
+                ToggleHistoryBtn.IsChecked = false;
+                MainSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
+            }
+
+            if (e.NewSize.Height >= 720 && e.NewSize.Width >= 1008)
+            {
+                HideHistoryBtn.Margin = new Thickness(0, 40, 64, 0);
+                lv_history.Margin = new Thickness(12, 0, 64, 64);
+                HistoryHeader.Margin = new Thickness(12, 64, 0, 32);
+                ContentView.Padding = AboutPanel.Margin = new Thickness(64);
+            }
+            else
+            {
+                HideHistoryBtn.Margin = new Thickness(0, 32, 24, 0);
+                lv_history.Margin = new Thickness(12, 0, 24, 24);
+                HistoryHeader.Margin = new Thickness(12, 32, 0, 24);
+                AboutPanel.Margin = new Thickness(24);
+                ContentView.Padding = new Thickness(24, 32, 24, 24);
             }
         }
 
         private void ToggleHistoryBtn_Checked(object sender, RoutedEventArgs e)
         {
             MainSplitView.IsPaneOpen = true;
-            MainSplitView.OpenPaneLength = 320;
+            
+            if (RootGrid.ActualWidth >= 1200)
+            {
+                MainSplitView.OpenPaneLength = 480;
+                MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
 
-            MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+                HideHistoryBtn.Visibility = Visibility.Collapsed;
+            }
+            else if (RootGrid.ActualWidth >= 1008 && RootGrid.ActualWidth < 1200)
+            {
+                MainSplitView.OpenPaneLength = 320;
+                MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+
+                HideHistoryBtn.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                MainSplitView.OpenPaneLength = 320;
+                HideHistoryBtn.Visibility = Visibility.Visible;
+
+                MainSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
+            }
         }
 
         private void ToggleHistoryBtn_Unchecked(object sender, RoutedEventArgs e)
@@ -350,8 +427,7 @@ namespace SubQuests.UWP
 
         private void Tb_q_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // Save to history
-            AddandSaveList(tb_q.Text, tb_ans.Text);
+
         }
 
         private void Lv_history_ItemClick(object sender, ItemClickEventArgs e)
@@ -362,6 +438,25 @@ namespace SubQuests.UWP
                 tb_q.Text = item.q;
                 tb_ans.Text = item.a;
             }
+
+            // Show answer panel
+            g_answer.Visibility = Visibility.Visible;
+            btn_showans.Content = "Hide answer";
+        }
+
+        private void HideHistoryBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleHistoryBtn.IsChecked = false;
+        }
+
+        private void MainSplitView_PaneClosed(SplitView sender, object args)
+        {
+            ToggleHistoryBtn.IsChecked = false;
+        }
+
+        private async void btn_git_Click(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("https://reddvid.github.io"));
         }
 
         private void btn_refresh_Click(object sender, RoutedEventArgs e)

@@ -27,7 +27,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -42,22 +42,11 @@
             </TransitionCollection>
         </Grid.ChildrenTransitions>
 
-        <!--  TITLE BAR  -->
-        <Grid
-            x:Name="g_titlebar"
-            Grid.Row="0"
-            Grid.ColumnSpan="2"
-            VerticalAlignment="Top">
-            <TextBlock
-                Margin="12,8"
-                HorizontalAlignment="Center"
-                Style="{ThemeResource CaptionTextBlockStyle}" />
-        </Grid>
-
         <!--  MAIN CONTENT  -->
         <SplitView
             x:Name="MainSplitView"
-            PaneBackground="Transparent"
+            PaneBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+            PaneClosed="MainSplitView_PaneClosed"
             PanePlacement="Right">
             <SplitView.Pane>
                 <!--  HISTORY LIST  -->
@@ -66,32 +55,49 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Margin="0,64,0,24">
-                        <TextBlock
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Bottom"
-                            CharacterSpacing="-50"
-                            FontSize="24"
-                            FontWeight="SemiBold"
-                            IsHitTestVisible="False"
-                            Style="{ThemeResource HeaderTextBlockStyle}"
-                            Text="History" />
+                    <Grid>
+                        <StackPanel
+                            x:Name="HistoryHeader"
+                            Margin="0,64,0,32"
+                            IsHitTestVisible="False">
+                            <TextBlock
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                CharacterSpacing="-50"
+                                FontSize="24"
+                                FontWeight="SemiBold"
+                                IsHitTestVisible="False"
+                                Style="{ThemeResource HeaderTextBlockStyle}"
+                                Text="History" />
 
-                        <!--  EMPTY MESSAGE  -->
-                        <TextBlock
-                            x:Name="tb_emptylist"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            VerticalAlignment="Top"
-                            x:Load="False"
-                            Style="{ThemeResource BaseTextBlockStyle}"
-                            Text="There's no history of questions yet" />
-                    </StackPanel>
+                            <!--  EMPTY MESSAGE  -->
+                            <TextBlock
+                                x:Name="tb_emptylist"
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                VerticalAlignment="Top"
+                                x:Load="False"
+                                Style="{ThemeResource BaseTextBlockStyle}"
+                                Text="There's no history of questions yet" />
+                        </StackPanel>
+                        <Button
+                            x:Name="HideHistoryBtn"
+                            Width="60"
+                            Height="60"
+                            Margin="0,40,64,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Click="HideHistoryBtn_Click"
+                            Content="&#xE711;"
+                            FontFamily="Segoe MDL2 Assets"
+                            FontSize="22"
+                            ToolTipService.ToolTip="Close History" />
+                    </Grid>
                     <ListView
                         x:Name="lv_history"
                         Grid.Row="1"
                         Grid.Column="1"
-                        MaxWidth="340"
                         Margin="0,0,64,64"
                         IsItemClickEnabled="True"
                         ItemClick="Lv_history_ItemClick"
@@ -138,7 +144,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.RowSpan="2" Padding="64">
+                    <StackPanel
+                        x:Name="ContentView"
+                        Grid.RowSpan="2"
+                        Padding="64">
                         <!--  TITLE AND TOGGLE BUTTON  -->
                         <RelativePanel>
                             <TextBlock
@@ -161,7 +170,7 @@
                                 FontSize="22"
                                 RelativePanel.AlignRightWithPanel="True"
                                 RelativePanel.AlignVerticalCenterWithPanel="True"
-                                ToolTipService.ToolTip="Show History"
+                                ToolTipService.ToolTip="Toggle History"
                                 Unchecked="ToggleHistoryBtn_Unchecked" />
                         </RelativePanel>
                         <Border Height="48" />
@@ -179,8 +188,8 @@
                             BorderThickness="0"
                             FontSize="24"
                             FontStyle="Italic"
-                            IsHitTestVisible="False" Text="Sample question"
-                            TextChanged="Tb_q_TextChanged"
+                            IsHitTestVisible="False"
+                            Text="Sample question"
                             TextWrapping="Wrap" />
                         <Border Height="48" />
 
@@ -203,7 +212,10 @@
                                 FontWeight="Bold"
                                 Text="Sample answer" />
                         </Grid>
+
                         <Border Height="48" />
+
+                        <!--  BUTTONS  -->
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -228,12 +240,14 @@
                                 Style="{StaticResource ButtonRevealStyle}" />
                             <Button
                                 x:Name="btn_next"
-                                Grid.Column="2" Click="btn_next_Click"
+                                Grid.Column="2"
                                 Height="48"
                                 HorizontalAlignment="Stretch"
+                                Click="btn_next_Click"
                                 Content="Next question"
                                 Style="{StaticResource ButtonRevealStyle}" />
                         </Grid>
+
                         <!--  AD GOES HERE  -->
                         <UI:AdControl
                             Width="728"
@@ -244,76 +258,71 @@
                             ApplicationId="9nplbp33n95t" />
 
                     </StackPanel>
+
                     <!--  ABOUT PANEL  -->
                     <StackPanel
-                        x:Name="g_about"
+                        x:Name="AboutPanel"
                         Grid.Row="3"
                         Margin="64"
                         HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom">
-                        <StackPanel Orientation="Horizontal">
-                            <HyperlinkButton
+                        VerticalAlignment="Bottom"
+                        Spacing="4">
+                        <TextBlock>
+                            <Hyperlink
                                 x:Name="btn_website"
-                                Margin="0,0,6,0"
-                                Padding="0"
                                 Click="btn_website_Click"
-                                Content="Subnetting Questions"
-                                FontSize="12"
-                                Style="{ThemeResource TextBlockButtonStyle}" />
-                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="website by" />
-                            <HyperlinkButton
+                                UnderlineStyle="None">
+                                Subnetting Questions
+                            </Hyperlink>
+                            <Run Text="website by" />
+                            <Hyperlink
                                 x:Name="btn_websiteauthor"
-                                Margin="6,0"
-                                Padding="0"
                                 Click="btn_websiteauthor_Click"
-                                Content="© Kim Nobay"
-                                FontSize="12"
-                                Style="{ThemeResource TextBlockButtonStyle}" />
-                        </StackPanel>
-                        <Border Height="4" />
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="App developed by" />
-                            <HyperlinkButton
-                                x:Name="btn_dev"
-                                Margin="6,1,6,0"
-                                Padding="0"
-                                Click="btn_dev_Click"
-                                Content="Red David"
-                                FontSize="12"
-                                Style="{ThemeResource TextBlockButtonStyle}" />
+                                UnderlineStyle="None">
+                                © Kim Nobay
+                            </Hyperlink>
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock>
+                                <Run Text="App by" />
+                                <Hyperlink Click="btn_dev_Click" UnderlineStyle="None">Red David</Hyperlink>
+                            </TextBlock>
                             <HyperlinkButton
                                 x:Name="btn_twitter"
-                                Margin="6,0"
                                 Padding="0"
                                 Click="btn_twitter_Click">
-                                <Image Width="16" Source="/twitter.png" />
+                                <Image Width="20" Source="/twitter.png" />
                             </HyperlinkButton>
                             <HyperlinkButton
                                 x:Name="btn_fb"
                                 Padding="0"
                                 Click="btn_fb_Click">
-                                <Image Width="16" Source="/fb.png" />
+                                <Image Width="20" Source="/fb.png" />
                             </HyperlinkButton>
-
+                            <HyperlinkButton
+                                x:Name="btn_git"
+                                Padding="0"
+                                Click="btn_git_Click">
+                                <Image Width="20" Source="/git.png" />
+                            </HyperlinkButton>
                         </StackPanel>
-                        <Border Height="4" />
-                        <StackPanel Orientation="Horizontal">
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
                             <HyperlinkButton
                                 x:Name="btn_donate"
                                 Padding="0"
                                 Click="btn_donate_Click"
-                                Content="Donate via PayPal"
-                                FontSize="12"
+                                Content="Buy me a coffee"
                                 Style="{ThemeResource TextBlockButtonStyle}" />
                             <HyperlinkButton
                                 x:Name="btn_feedback"
-                                Margin="18,0"
                                 Padding="0"
                                 Click="btn_feedback_Click"
                                 Content="Send feedback"
-                                FontSize="12"
                                 Style="{ThemeResource TextBlockButtonStyle}" />
+
                         </StackPanel>
+
                     </StackPanel>
                 </Grid>
             </SplitView.Content>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,6 +36,8 @@ namespace SubQuests.UWP
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            AppCenter.Start("2542d75e-b286-45a3-8ded-bbe3e754f20d", typeof(Analytics));
         }
 
         /// <summary>
@@ -72,11 +76,11 @@ namespace SubQuests.UWP
                     // parameter
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
-
-                
-
+                              
                 // Ensure the current window is active
                 Window.Current.Activate();
+                
+                
 
                 try
                 {
