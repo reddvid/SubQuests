@@ -50,8 +50,10 @@ namespace SubQuests.UWP
 
         private void MaximizeApp()
         {
-            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(600, 700));
-            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Maximized;
+            ApplicationView.PreferredLaunchViewSize = new Size(1200, 700);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(1200, 700));
 
         }
 
